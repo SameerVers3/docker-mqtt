@@ -1,11 +1,11 @@
+# scripts/docker-entrypoint.sh
 #!/bin/bash
-
 set -e
 
-# Generate SSL certificates if they don't exist
+# Initialize Let's Encrypt certificates if they don't exist
 if [ ! -f "/mosquitto/certs/server.crt" ] || [ ! -f "/mosquitto/certs/server.key" ]; then
-    echo "Generating SSL certificates..."
-    /usr/local/bin/generate-self-signed-certs.sh
+    echo "Requesting Let's Encrypt certificates..."
+    /usr/local/bin/init-letsencrypt.sh
 fi
 
 # Generate password file if it doesn't exist
@@ -15,6 +15,7 @@ if [ ! -f "/mosquitto/password/passwd" ]; then
 else
     echo "Overwriting password file..."
 fi
+
 mosquitto_passwd -b -c /mosquitto/password/passwd "$USERNAME" "$PASSWORD"
 
 # Ensure proper permissions

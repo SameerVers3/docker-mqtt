@@ -1,3 +1,4 @@
+# docker-compose.yml
 services:
   mosquitto:
     build:
@@ -5,15 +6,21 @@ services:
     image: custom-mosquitto:latest
     restart: unless-stopped
     ports:
+      - "80:80"  # Required for Let's Encrypt HTTP challenge
       - "${MQTT_PORT}:${MQTT_PORT}"
       - "${WEBSOCKET_PORT}:${WEBSOCKET_PORT}"
     volumes:
       - ./certs:/mosquitto/certs
       - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - letsencrypt:/etc/letsencrypt
     environment:
       - USERNAME
       - PASSWORD
-      - HOSTNAME
+      - DOMAIN
+      - EMAIL
       - LOG_TYPE=${LOG_TYPE}
       - MQTT_PORT=${MQTT_PORT}
       - WEBSOCKET_PORT=${WEBSOCKET_PORT}
+
+volumes:
+  letsencrypt:
